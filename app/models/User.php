@@ -22,12 +22,13 @@ use yii\helpers\ArrayHelper;
  *
  * @property Pet[] $pets
  * @property-read void $authKey
+ * @property-write mixed $password
  * @property UserPet[] $userPets
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return ArrayHelper::merge(parent::behaviors(),[
             'timestamp' => [
@@ -44,7 +45,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'user';
     }
@@ -57,7 +58,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['status'], 'default', 'value' => 10],
@@ -73,7 +74,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -93,9 +94,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      * @return ActiveQuery
      * @throws InvalidConfigException
      */
-    public function getPets()
+    public function getPets(): ActiveQuery
     {
-        return $this->hasMany(Pet::class, ['id' => 'pet_id'])->viaTable('user_pet', ['user_id' => 'id']);
+        return $this->hasMany(Pet::class, ['id' => 'pet_id'])
+            ->viaTable('user_pet', ['user_id' => 'id']);
     }
 
     /**
@@ -103,7 +105,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      *
      * @return ActiveQuery
      */
-    public function getUserPets()
+    public function getUserPets(): ActiveQuery
     {
         return $this->hasMany(UserPet::class, ['user_id' => 'id']);
     }
@@ -118,17 +120,17 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return self::findOne(['auth_key' => $token]);
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getAuthKey()
+    public function getAuthKey(): string
     {
         return $this->auth_key;
     }
 
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authKey): bool
     {
         return $this->auth_key === $authKey;
     }
@@ -149,7 +151,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
 
-    public function validatePassword($password)
+    public function validatePassword($password): bool
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }

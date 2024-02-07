@@ -23,6 +23,8 @@ use yii\helpers\ArrayHelper;
  */
 class Pet extends \yii\db\ActiveRecord
 {
+    const STATUS_DELETED = 0;
+    const STATUS_ACTIVE = 10;
 
     public function behaviors()
     {
@@ -40,7 +42,7 @@ class Pet extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'pet';
     }
@@ -48,7 +50,7 @@ class Pet extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['location', 'imageFile'], 'default', 'value' => null],
@@ -62,7 +64,7 @@ class Pet extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -80,9 +82,9 @@ class Pet extends \yii\db\ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getUserPets()
+    public function getUserPets(): ActiveQuery
     {
-        return $this->hasMany(UserPet::class, ['pet_id' => 'id']);
+        return $this->hasMany(UserPet::class, ['pet_id' => 'id'])->where(['status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -91,7 +93,7 @@ class Pet extends \yii\db\ActiveRecord
      * @return ActiveQuery
      * @throws InvalidConfigException
      */
-    public function getUsers()
+    public function getUsers(): ActiveQuery
     {
         return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_pet', ['pet_id' => 'id']);
     }

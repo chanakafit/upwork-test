@@ -19,8 +19,8 @@ class UserPetController extends \yii\web\Controller
                 'rules' => [
                     [
                         'actions' => ['index', 'list-pet', 'user-pet-list', 'delete-pet', 'submit-form'],
-                        'allow' => true,
-                        'roles' => ['@'],
+                        'allow'   => true,
+                        'roles'   => ['@'],
                     ],
                 ],
             ],
@@ -30,14 +30,13 @@ class UserPetController extends \yii\web\Controller
     public function actionIndex(): string
     {
         $pets = Yii::$app->user->identity->getPets()->all();
-        return $this->render('index',['pets' => $pets]);
+        return $this->render('index', ['pets' => $pets]);
     }
 
     public function actionListPet($searchQuery): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $pets = Pet::find()->where(['like', 'name', $searchQuery])->all();
-        return $pets;
+        return Pet::find()->where(['like', 'name', $searchQuery])->andWhere(['status' => Pet::STATUS_ACTIVE])->all();
     }
 
     public function actionUserPetList()
@@ -49,14 +48,14 @@ class UserPetController extends \yii\web\Controller
     public function actionDeletePet(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        if(UserPet::deleteAll(['user_id' => Yii::$app->user->identity->id])){
+        if (UserPet::deleteAll(['user_id' => Yii::$app->user->identity->id])) {
             return [
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Pets delete successfully.#1844'
             ];
         }
         return [
-            'status' => 'error',
+            'status'  => 'error',
             'message' => 'Pets not delete successfully.#1844'
         ];
     }
@@ -71,13 +70,12 @@ class UserPetController extends \yii\web\Controller
         $decodedPayload = json_decode($requestPayload, true);
 
         $selectedOptions = $decodedPayload['selectedOptions'];
-        $userId = Yii::$app->user->identity->id;
 
         UserPet::addPets($selectedOptions);
 
         return [
-            'success' => true,
-            'message' => 'Pets assigned successfully.',
+            'success'  => true,
+            'message'  => 'Pets assigned successfully.',
             'userpets' => Yii::$app->user->identity->getPets()->all()
         ];
     }
